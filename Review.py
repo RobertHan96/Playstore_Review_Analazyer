@@ -24,7 +24,7 @@ class Reviews :
     url = ''
     reviews = []
     timeout_limit = 5
-    crwaled_reviews_count = -1
+    crwaled_reviews_count = -2
 
     def __init__(self, url):
         self.url = url
@@ -46,11 +46,10 @@ class Reviews :
             driver.get(url)
             driver.implicitly_wait(100)
 
-            count = 0
-            while count < 10 :
+            for i in range(10) :
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight)")
-                count += 1
                 time.sleep(1)
+
             html = driver.page_source
             bs = BeautifulSoup(html, "lxml")
 
@@ -61,21 +60,19 @@ class Reviews :
             for star in stars :
                 self.crwaled_reviews_count += 1
                 rated_text = star.get_attribute('aria-label')
-                rated_text = star_arr.append(RawHtmlParser.parseStarInfo(rated_text))
+                rated_text =  RawHtmlParser.parseStarInfo(rated_text)
                 star_arr.append(rated_text)
 
-            print("크롤링한 데이터 개수 : {}".format(self.crwaled_reviews_count))
-
-            for i in range(len(self.crwaled_reviews_count)):
+            for i in range(len(comments)):
                 review = Review(dates[i].text, comments[i].text, star_arr[i])
-                print(dates[i].text, comments[i].text, star_arr[i],end='\n')
                 self.reviews.append(review)
 
             driver.close()
             driver.quit()
             return self.reviews
         except:
-            return ErrorHanlder.crwaling_fail_text
+            print(ErrorHanlder.crwaling_fail_text)
+            return self.reviews
 
 class RawHtmlParser :
     @staticmethod
