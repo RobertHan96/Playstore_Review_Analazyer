@@ -8,7 +8,9 @@ from selenium.webdriver.support import expected_conditions as EC
 
 class ErrorHanlder :
     crwaling_fail_text = "크롤링 실패"
+    crwaling_completed_text = "크롤링 완료"
     connection_fail_err_text = "Error : 타겟 사이트 접속 불가\n"
+
 
 class Review:
     date = ''
@@ -69,6 +71,7 @@ class Reviews :
 
             driver.close()
             driver.quit()
+            print(ErrorHanlder.crwaling_completed_text)
             return self.reviews
         except:
             print(ErrorHanlder.crwaling_fail_text)
