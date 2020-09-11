@@ -40,10 +40,17 @@ def _main() :
     plt.plot(frequently_mentioned_words, mentioned_time,'skyblue')
     plt.show()
 
+    # 감정분석 사전에서 단어를 분석하고(모듈 import에러 해결 필요)
+    # 전체 감정에서 긍정, 부정 비율을 구해서 각각 return
+    # 해당 값을 토대로 파이 챠트 생성
+    positive = 0.7
+    negative = 0.3
+    feedbacks = [positive, negative]
     label = ['긍정', '부정']
-    color = ['#14CCC0', '#389993',
-    plt.pie(, labels=label, colors=color, autopct='%1.f%%')
+    color = ['#14CCC0', '#FF1C6A']
+    plt.pie(feedbacks, labels=label, colors=color, autopct='%1.f%%')
     plt.axis('equal')
+    plt.show()
 
 
 class WordCloud :
