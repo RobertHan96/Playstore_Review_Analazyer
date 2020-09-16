@@ -1,7 +1,6 @@
-from  Review import  Review, Reviews
+from  Review import Reviews
 from konlpy.tag import Okt
 from collections import Counter
-import sys
 import  operator
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
@@ -9,14 +8,16 @@ from matplotlib import rc
 okt = Okt()
 request_url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 
-
 def _main() :
-    wc = WordCloud()
+    ratings = []
+    dates = []
     nouns_list = []
     morphs_list = []
     review = Reviews(request_url)
     review.getReviews(review.url)
     for i in review.reviews :
+        ratings.append(i.stars)
+        dates.append(par(i.date))
         noun = okt.nouns(i.comment) #명사만 뽑는 함수
         morph = okt.morphs(i.comment) #형태소로 구분해서 뽑는 함수
         for nn in noun :
@@ -24,33 +25,70 @@ def _main() :
                 nouns_list.append(nn)
         for mor in morph :
             morphs_list.append(mor)
-    # 각 단어별 출현 횟수 카운팅
-    noun_result = Counter(nouns_list)
-    morph_result = Counter(morphs_list)
-    morph_arr = sorted(morph_result.items(), key=operator.itemgetter(1), reverse=True)
-    morph_arr = morph_arr[:5]
-    frequently_mentioned_words = [i[0] for i in morph_arr]
-    mentioned_time = [i[1] for i in morph_arr]
+
+    x, y = m
+
+    ratings = Counter(ratings)
+    dates = Counter(dates)
+    review_trend_arr = sorted(ratings.items(), key=operator.itemgetter(0), reverse=True)
+    dates_arr = [i[0] for i in review_trend_arr]
+    ratings_count_arr = [i[1] for i in review_trend_arr]
+
 
     # 출현 횟수와 각 단어를 묶어서 딕셔너리 형태로 변환
     # nouns = dict(noun_result.most_common())
     # morphs = dict(morph_result.most_common())
-    plt.rc('font', family='NanumBarunGothic')
-    plt.title('가장 많이 언급된 단어')
-    plt.plot(frequently_mentioned_words, mentioned_time,'skyblue')
-    plt.show()
 
     # 감정분석 사전에서 단어를 분석하고(모듈 import에러 해결 필요)
     # 전체 감정에서 긍정, 부정 비율을 구해서 각각 return
     # 해당 값을 토대로 파이 챠트 생성
-    positive = 0.7
-    negative = 0.3
-    feedbacks = [positive, negative]
-    label = ['긍정', '부정']
-    color = ['#14CCC0', '#FF1C6A']
-    plt.pie(feedbacks, labels=label, colors=color, autopct='%1.f%%')
-    plt.axis('equal')
-    plt.show()
+
+    charts_maker = ChartsMaker()
+    charts_maker.wordsFrequencyChart(, )
+    # charts_maker.trendsPieChart(20, ratings)
+    # charts_maker.wordsFrequencyChart(dates, ratings)
+
+def makeNounsArr(arr) :
+    nouns_result = Counter(nouns_list)
+    # 단어 등장 횟수가 많은 순서대로 리스트 재정렬
+    nouns_result = sorted(nouns_result.items(), key=operator.itemgetter(1), reverse=True)
+    frequently_mentioned_words = [i[0] for i in nouns_result[:5]]
+    mentioned_time = [i[1] for i in nouns_result[:5]]
+
+    return frequently_mentioned_words, mentioned_time
+
+def parseReviewDay(review_date) :
+    day = review_date.split(' ')[2]
+    if len(day) == 3:
+        day = day[:2]
+    else :
+        day = day[:1]
+    return int(day)
+
+
+class ChartsMaker :
+    @staticmethod
+    def wordsFrequencyChart(words, mentioned_time) :
+        plt.rc('font', family='NanumBarunGothic')
+        plt.title('가장 많이 언급된 단어')
+        plt.plot(words, mentioned_time, 'skyblue')
+        plt.show()
+
+    @staticmethod
+    def ratingChart(date, stars) :
+        plt.rc('font', family='NanumBarunGothic')
+        plt.title('평점 추이')
+        plt.plot(stars, date, 'skyblue')
+        plt.show()
+
+    @staticmethod
+    def trendsPieChart(positive, negative):
+        feedbacks = [positive, negative]
+        label = ['긍정', '부정']
+        color = ['#14CCC0', '#FF1C6A']
+        plt.pie(feedbacks, labels=label, colors=color, autopct='%1.f%%')
+        plt.axis('equal')
+        plt.show()
 
 
 class WordCloud :

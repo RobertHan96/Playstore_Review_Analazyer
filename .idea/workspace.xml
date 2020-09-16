@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61cd513a-9948-4ac7-8868-7accf7821fb7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/getNaverShopReviews.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
@@ -62,7 +63,10 @@
       <workItem from="1599550910797" duration="1688000" />
       <workItem from="1599635757854" duration="1669000" />
       <workItem from="1599637498025" duration="15809000" />
-      <workItem from="1599803224918" duration="4972000" />
+      <workItem from="1599803224918" duration="5174000" />
+      <workItem from="1600148935695" duration="8936000" />
+      <workItem from="1600232007171" duration="2725000" />
+      <workItem from="1600242451714" duration="176000" />
     </task>
     <servers />
   </component>
