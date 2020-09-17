@@ -8,48 +8,9 @@ from matplotlib import rc
 okt = Okt()
 request_url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 
-def _main() :
-    ratings = []
-    dates = []
-    nouns_list = []
-    morphs_list = []
-    review = Reviews(request_url)
-    review.getReviews(review.url)
-    for i in review.reviews :
-        ratings.append(i.stars)
-        dates.append(par(i.date))
-        noun = okt.nouns(i.comment) #명사만 뽑는 함수
-        morph = okt.morphs(i.comment) #형태소로 구분해서 뽑는 함수
-        for nn in noun :
-            if len(nn) > 1:
-                nouns_list.append(nn)
-        for mor in morph :
-            morphs_list.append(mor)
 
-    x, y = m
-
-    ratings = Counter(ratings)
-    dates = Counter(dates)
-    review_trend_arr = sorted(ratings.items(), key=operator.itemgetter(0), reverse=True)
-    dates_arr = [i[0] for i in review_trend_arr]
-    ratings_count_arr = [i[1] for i in review_trend_arr]
-
-
-    # 출현 횟수와 각 단어를 묶어서 딕셔너리 형태로 변환
-    # nouns = dict(noun_result.most_common())
-    # morphs = dict(morph_result.most_common())
-
-    # 감정분석 사전에서 단어를 분석하고(모듈 import에러 해결 필요)
-    # 전체 감정에서 긍정, 부정 비율을 구해서 각각 return
-    # 해당 값을 토대로 파이 챠트 생성
-
-    charts_maker = ChartsMaker()
-    charts_maker.wordsFrequencyChart(, )
-    # charts_maker.trendsPieChart(20, ratings)
-    # charts_maker.wordsFrequencyChart(dates, ratings)
-
-def makeNounsArr(arr) :
-    nouns_result = Counter(nouns_list)
+def convertMentionedWordsForMakeChart(arr) :
+    nouns_result = Counter(arr)
     # 단어 등장 횟수가 많은 순서대로 리스트 재정렬
     nouns_result = sorted(nouns_result.items(), key=operator.itemgetter(1), reverse=True)
     frequently_mentioned_words = [i[0] for i in nouns_result[:5]]
@@ -57,6 +18,14 @@ def makeNounsArr(arr) :
 
     return frequently_mentioned_words, mentioned_time
 
+def convertRatingsForMakeChart(arr) :
+    counter_arr = Counter(arr)
+    # 평점별 개수(5점 ~ 1점 순으로) 리스트 재정렬
+    counter_arr = sorted(counter_arr.items(), key=operator.itemgetter(0), reverse=True)
+    ratins = [i[0] for i in counter_arr]
+    mentioned_time = [i[1] for i in counter_arr]
+
+    return ratins, mentioned_time
 def parseReviewDay(review_date) :
     day = review_date.split(' ')[2]
     if len(day) == 3:
@@ -65,20 +34,27 @@ def parseReviewDay(review_date) :
         day = day[:1]
     return int(day)
 
-
 class ChartsMaker :
     @staticmethod
     def wordsFrequencyChart(words, mentioned_time) :
         plt.rc('font', family='NanumBarunGothic')
         plt.title('가장 많이 언급된 단어')
+        plt.xlabel('단어')
+        plt.ylabel('언급 횟수')
+
         plt.plot(words, mentioned_time, 'skyblue')
         plt.show()
 
     @staticmethod
-    def ratingChart(date, stars) :
+    def ratingChart(ratings, rating_counts) :
         plt.rc('font', family='NanumBarunGothic')
         plt.title('평점 추이')
-        plt.plot(stars, date, 'skyblue')
+        plt.xlabel('평점')
+        plt.ylabel('평점 수')
+        plt.bar(ratings, rating_counts)
+        # for i, v in enumerate(rating_counts) :
+        #     string_value = '{}명'.format(rating_counts[i])
+        #     plt.text(v, rating_counts[i],string_value, fontsize=10, color='ff0000')
         plt.show()
 
     @staticmethod
@@ -91,22 +67,47 @@ class ChartsMaker :
         plt.show()
 
 
-class WordCloud :
-    def makeWordCloud(words) :
-        rc('font', family='NanumBarunGothic')
-        # 워드크라우드 디자인 테마 초기 설정
-        wc = WordCloud(font_path= '/Library/Fonts/NanumBarunGothic.ttf', background_color='white', colormap='Accent_r', width=800, height=800)
-        wc.generate_from_frequencies(words) # 워드크라우드 분석할 데이터를 객체에 삽입
-        # wc_arrary = wc.to_array()
+def makeWordCloud(words) :
+    rc('font', family='NanumBarunGothic')
+    # 워드크라우드 디자인 테마 초기 설정
+    wc = WordCloud(font_path= '/Library/Fonts/NanumBarunGothic.ttf', background_color='white', colormap='Accent_r', width=800, height=800)
+    wc.generate_from_frequencies(words) # 워드크라우드 분석할 데이터를 객체에 삽입
+    wc_arrary = wc.to_array()
 
-        # return wc_arrary
+    fig = plt.figure(figsize=(10, 10))
+    plt.imshow(wc_arrary, interpolation="bilinear")
+    plt.axis('off')
+    plt.show()
+    fig.savefig('anlytics_result.png')
 
-    def makeWordCloudImageFile(wc_arr):
-        fig = plt.figure(figsize=(10, 10))
-        plt.imshow(wc_arr, interpolation="bilinear")
-        plt.axis('off')
-        plt.show()
-        fig.savefig('anlytics_result.png')
+def _main() :
+    charts_maker = ChartsMaker()
+    ratings = []
+    dates = []
+    nouns_list = []
+    morphs_list = []
+    review = Reviews(request_url)
+    review.getReviews(review.url)
+
+    for i in review.reviews :
+        ratings.append(i.stars)
+        dates.append(parseReviewDay(i.date))
+        noun = okt.nouns(i.comment) #명사만 뽑는 함수
+        morph = okt.morphs(i.comment) #형태소로 구분해서 뽑는 함수
+        for nn in noun :
+            if len(nn) > 1:
+                nouns_list.append(nn)
+        for mor in morph :
+            morphs_list.append(mor)
+
+    nouns, nouns_count = convertMentionedWordsForMakeChart(nouns_list)
+    morphs, morphs_count = convertMentionedWordsForMakeChart(morphs_list)
+    nouns_counter_dict = Counter(nouns_list)
+    ratings, rating_count = convertMentionedWordsForMakeChart(ratings)
+
+    charts_maker.wordsFrequencyChart(nouns, nouns_count )
+    charts_maker.ratingChart(ratings, rating_count)
+    makeWordCloud(nouns_counter_dict)
 
 if __name__ == "__main__":
     _main()
