@@ -8,7 +8,6 @@ from matplotlib import rc
 okt = Okt()
 request_url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 
-
 def convertMentionedWordsForMakeChart(arr) :
     nouns_result = Counter(arr)
     # 단어 등장 횟수가 많은 순서대로 리스트 재정렬
@@ -80,7 +79,7 @@ class ChartsMaker :
 def makeWordCloud(words) :
     rc('font', family='NanumBarunGothic')
     # 워드크라우드 디자인 테마 초기 설정
-    wc = WordCloud(font_path= '/Library/Fonts/NanumBarunGothic.ttf', background_color='white', colormap='Accent_r', width=800, height=800)
+    wc = WordCloud(font_path= '/Library/Fonts/NanumBarunGothic.ttf', background_color='white', colormap='Accent_r', width=900, height=400)
     wc.generate_from_frequencies(words) # 워드크라우드 분석할 데이터를 객체에 삽입
     wc_arrary = wc.to_array()
 
