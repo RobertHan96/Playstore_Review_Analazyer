@@ -2,8 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61cd513a-9948-4ac7-8868-7accf7821fb7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/static/css/coming-soon.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/coming-soon.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/js/coming-soon.min.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/static/mp4/bg.mp4" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/analayze_result.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/anlytics_result.png" beforeDir="false" afterPath="$PROJECT_DIR$/anlytics_result.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/front_end/analayze_result_page/index.html" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -23,11 +29,13 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1hDg7UfmW9MjSs9M88jTa7obziH" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="PropertiesComponent">
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/venv" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/static" />
     <property name="node.js.detected.package.eslint" value="true" />
     <property name="node.js.detected.package.tslint" value="true" />
     <property name="node.js.path.for.package.eslint" value="project" />
@@ -36,11 +44,15 @@
     <property name="node.js.selected.package.tslint" value="(autodetect)" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/venv" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
+      <recent name="$PROJECT_DIR$/templates/static" />
+      <recent name="$PROJECT_DIR$/venv" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/static" />
+      <recent name="$PROJECT_DIR$/static/css" />
+      <recent name="$PROJECT_DIR$/templates" />
       <recent name="$PROJECT_DIR$/venv" />
     </key>
   </component>
@@ -73,7 +85,7 @@
       <workItem from="1600148935695" duration="8936000" />
       <workItem from="1600232007171" duration="2725000" />
       <workItem from="1600242451714" duration="7020000" />
-      <workItem from="1600407510891" duration="655000" />
+      <workItem from="1600407510891" duration="6585000" />
     </task>
     <servers />
   </component>

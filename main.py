@@ -1,3 +1,4 @@
+from flask import Flask, render_template, request
 from  Review import Reviews
 from konlpy.tag import Okt
 from collections import Counter
@@ -5,6 +6,8 @@ import  operator
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from matplotlib import rc
+
+app = Flask(__name__)
 okt = Okt()
 request_url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 
@@ -119,5 +122,15 @@ def _main() :
     charts_maker.ratingPieChart(rating_count, ratings)
     makeWordCloud(nouns_counter_dict)
 
-if __name__ == "__main__":
-    _main()
+# if __name__ == "__main__":
+    # app.run(host='0.0.0.0', port='5050')
+
+@app.route('/', methods=['GET'])
+def index():
+    if request.method == 'GET' :
+        name = request.args.get("url", "https://www.youtube.com/")
+    return render_template('index.html', name=name )
+
+@app.route("/analazye/")
+def analazye():
+    return render_template('analayze_result.html')
