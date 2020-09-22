@@ -36,12 +36,17 @@
             <p class="mb-5">리뷰에 많이 언급된 단어, 평점 통계를 확인하세요.
                             시각화 자료인 Wrod Clud도 제공합니다!</p>
             <div class="input-group input-group-newsletter">
-              <input type="email" class="form-control" placeholder="url 입력" aria-label="url 입력" aria-describedby="submit-button">
+
+        <form action="{{ url_for('analyze') }}" method="POST">
+          <input type="text" class="form-control" name="target_url" placeholder="url 입력" aria-label="url 입력" aria-describedby="submit-button">
               <div class="input-group-append">
                 <button class="btn btn-secondary" type="button" id="submit-button">
-                  <a href={{ url_for('analazye') }}> 분석하기 </a>
+                  <input type="submit" value="분석하기">
+
                 </button>
               </div>
+        </form>
+
             </div>
           </div>
         </div>
