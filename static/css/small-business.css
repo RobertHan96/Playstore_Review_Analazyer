@@ -5,4 +5,9 @@
  */
 body {
   padding-top: 56px;
+
+}
+
+.bg-dark {
+  bottom: 0;
 }
