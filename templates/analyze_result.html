@@ -19,7 +19,7 @@
   <!-- Navigation -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container">
-      <a class="navbar-brand" href="#">플레이스토어 앱 동향 분석기{{target_url}}</a>
+      <a class="navbar-brand" href="#">리뷰 분석 결과{{target_url}}</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -48,8 +48,8 @@
   <div class="container">
 
     <!-- Heading Row -->
-    <div class="row align-items-center my-5">
-      <div class="col-lg-3">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
         <h1 class="font-weight-light">Word Cloud</h1>
         <p> 문서의 키워드, 개념 등을 직관적으로 파악할 수 있도록 핵심 단어를 시각적으로 돋보이게 하는 기법이다. 
         예를 들면 많이 언급될수록 단어를 크게 표현해 한눈에 들어올 수 있게 하는 기법 등이 있다. 
@@ -58,8 +58,8 @@
         <a class="btn btn-primary" href="#">Save Image</a>
       </div>
 
-      <div class="col-lg-3">
-        <img class="img-fluid rounded mb-4 mb-lg-5" src="../static/Images/word_cloud.png" alt="">
+      <div class="col-lg-6">
+        <img class="card-img rounded" src="../static/Images/word_cloud.png" alt="">
       </div>
       <!-- /.col-lg-8 -->
       <!-- /.col-md-4 -->
@@ -71,7 +71,7 @@
       <div class="col-md-4 mb-5">
         <div class="card h-100">
           <div class="card-body">
-            <img class="img-fluid  mb-4 mb-5" src="../static/Images/top5.png" alt="">
+            <img class="img-fluid  mb-4" src="../static/Images/top5.png" alt="">
           </div>
           <div class="card-footer">
             <a href="#" class="btn btn-primary btn-sm">Save Image</a>
@@ -94,7 +94,6 @@
         <div class="card h-100">
           <div class="card-body">
             <img class="img-fluid rounded mb-4 mb-lg-0" src="{{ url_for('static', filename='Images/rating_pie.png') }}" alt="">
-<!--            <img class="img-fluid rounded mb-4 mb-lg-0" src="static/Images/rating_pie.png" alt="">-->
           </div>
           <div class="card-footer">
             <a href="#" class="btn btn-primary btn-sm">Save Image</a>
@@ -111,7 +110,7 @@
 
   <!-- Footer -->
   <footer class="bg-dark">
-    <div class="container">
+    <div class="container py-3">
       <p class="m-0 text-center text-white">Copyright &copy; Studiofirstzero 2020</p>
     </div>
     <!-- /.container -->
