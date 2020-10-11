@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for
 from Review import Reviews
+from ChartsMaker import ChartsMaker
 from konlpy.tag import Okt
 from collections import Counter
 import operator
@@ -9,80 +10,58 @@ from matplotlib import rc
 
 app = Flask(__name__)
 okt = Okt()
-request_url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 
+# request_url_for_kartrider = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
+request_url = "https://play.google.com/store/apps/details?id=com.devsisters.gb&showAllReviews=true"
 
-def convertMentionedWordsForMakeChart(arr):
-    nouns_result = Counter(arr)
-    # 단어 등장 횟수가 많은 순서대로 리스트 재정렬
-    nouns_result = sorted(nouns_result.items(), key=operator.itemgetter(1), reverse=True)
-    frequently_mentioned_words = [i[0] for i in nouns_result[:5]]
-    mentioned_time = [i[1] for i in nouns_result[:5]]
+def _main():
+    charts_maker = ChartsMaker()
+    ratings = []
+    dates = []
+    nouns_list = []
+    review = Reviews(request_url)
+    review.getReviews(review.url)
 
-    return frequently_mentioned_words, mentioned_time
+    for i in review.reviews:
+        ratings.append(i.stars)
+        dates.append(parseReviewDay(i.date))
+        noun = okt.nouns(i.comment)  # 명사만 뽑는 함수
+        for nn in noun:
+            if len(nn) > 1:
+                nouns_list.append(nn)
 
+    # 단어만 나열된 하나의 리스트를 가장 많이 언급된 TOP5 단어, 언급횟수 리스트 두개로 변환해서 반환하는 함수
+    nouns, nouns_count = sortCounterArrary(nouns_list)
 
-def convertRatingsForMakeChart(arr):
-    counter_arr = Counter(arr)
-    # 평점별 개수(5점 ~ 1점 순으로) 리스트 재정렬
-    counter_arr = sorted(counter_arr.items(), key=operator.itemgetter(0), reverse=True)
-    ratins = [i[0] for i in counter_arr]
-    mentioned_time = [i[1] for i in counter_arr]
+    nouns_counter_dict = Counter(nouns_list)
+    ratings, rating_count = sortCounterArrary(ratings)
 
-    return ratins, mentioned_time
+    # 단어, 언급횟수 or 별점, 별점개수로만 이뤄진 리스트를 통해 챠트 시각화
+    charts_maker.wordsFrequencyChart(nouns, nouns_count)
+    charts_maker.ratingChart(ratings, rating_count)
+    charts_maker.ratingPieChart(rating_count, ratings)
 
+    # 워드크라우드는 단어, 언급횟수가 함께있는 딕셔너리 전
+    makeWordCloud(nouns_counter_dict)
 
-def parseReviewDay(review_date):
-    day = review_date.split(' ')[2]
-    if len(day) == 3:
-        day = day[:2]
+@app.route('/', methods=['POST', 'GET'])
+def index():
+    if request.method == 'POST':
+        url = request.form["target_url"]
+        # 데이터 크롤링 ~ 분석, 시각화 함수 호출
+        # 분석 결과 이미지 파일을 서버에서 다운로드 후 결과페이지로 redirect
+        return redirect(url_for("analyze", target_url=url))
     else:
-        day = day[:1]
-    return int(day)
+        return render_template('index.html')
 
+@app.route("/analyze", methods=['POST', 'GET'])
+def analyze():
+    url = request.form.get('target_url')
+    return render_template("analyze_result.html", target_url=url)
 
-class ChartsMaker:
-    @staticmethod
-    def wordsFrequencyChart(words, mentioned_time):
-        plt.rc('font', family='NanumBarunGothic')
-        plt.title('가장 많이 언급된 단어')
-        plt.xlabel('단어')
-        plt.ylabel('언급 횟수')
-        plt.plot(words, mentioned_time, 'skyblue', marker='o', ms=15, mfc='r')
-        for x, y in zip(words, mentioned_time):
-            label = y
-            plt.annotate(label,  # this is the text
-                         (x, y),  # this is the point to label
-                         va='center',
-                         ha='center')  # horizontal alignment can be left, right or center
-        plt.show()
-
-    @staticmethod
-    def ratingChart(ratings, rating_counts):
-        plt.rc('font', family='NanumBarunGothic')
-        plt.title('평점 추이')
-        plt.xlabel('평점')
-        plt.ylabel('평점 수')
-        plt.bar(ratings, rating_counts, color='lightblue')
-        plt.show()
-
-    @staticmethod
-    def trendsPieChart(positive, negative):
-        feedbacks = [positive, negative]
-        label = ['긍정', '부정']
-        color = ['#14CCC0', '#FF1C6A']
-        plt.pie(feedbacks, labels=label, colors=color, autopct='%1.f%%')
-        plt.axis('equal')
-        plt.show()
-
-    @staticmethod
-    def ratingPieChart(rating_count, labels_arr):
-        labels = ['{}점'.format(i) for i in labels_arr]
-        plt.title('평점 비율')
-        plt.pie(rating_count, labels=labels, autopct='%1.f%%')
-        plt.axis('equal')
-        plt.show()
-
+if __name__ == "__main__":
+    # app.run(host='0.0.0.0', port='5050')
+    _main()
 
 def makeWordCloud(words):
     rc('font', family='NanumBarunGothic')
@@ -99,51 +78,30 @@ def makeWordCloud(words):
     fig.savefig('anlytics_result.png')
 
 
-def _main():
-    charts_maker = ChartsMaker()
-    ratings = []
-    dates = []
-    nouns_list = []
-    morphs_list = []
-    review = Reviews(request_url)
-    review.getReviews(review.url)
+def sortCounterArrary(arr):
+    # 단어만 나열된 하나의 리스트를 가장 많이 언급된 TOP5 단어, 언급횟수 리스트 두개로 변환해서 반환하는 함수
+    nouns_result = Counter(arr)
+    nouns_result = sorted(nouns_result.items(), key=operator.itemgetter(1), reverse=True)
+    frequently_mentioned_words = [i[0] for i in nouns_result[:5]]
+    mentioned_time = [i[1] for i in nouns_result[:5]]
 
-    for i in review.reviews:
-        ratings.append(i.stars)
-        dates.append(parseReviewDay(i.date))
-        noun = okt.nouns(i.comment)  # 명사만 뽑는 함수
-        morph = okt.morphs(i.comment)  # 형태소로 구분해서 뽑는 함수
-        for nn in noun:
-            if len(nn) > 1:
-                nouns_list.append(nn)
-        for mor in morph:
-            morphs_list.append(mor)
+    return frequently_mentioned_words, mentioned_time
 
-    nouns, nouns_count = convertMentionedWordsForMakeChart(nouns_list)
-    morphs, morphs_count = convertMentionedWordsForMakeChart(morphs_list)
-    nouns_counter_dict = Counter(nouns_list)
-    ratings, rating_count = convertMentionedWordsForMakeChart(ratings)
+def convertRatingsForMakeChart(arr):
+    # 평점별 개수(5점 ~ 1점 순으로) 리스트 재정렬
+    counter_arr = Counter(arr)
+    counter_arr = sorted(counter_arr.items(), key=operator.itemgetter(0), reverse=True)
+    ratins = [i[0] for i in counter_arr]
+    mentioned_time = [i[1] for i in counter_arr]
 
-    charts_maker.wordsFrequencyChart(nouns, nouns_count)
-    charts_maker.ratingChart(ratings, rating_count)
-    charts_maker.ratingPieChart(rating_count, ratings)
-    makeWordCloud(nouns_counter_dict)
+    return ratins, mentioned_time
 
-# <a href={{ url_for('analazye') }}> 분석하기 </a>
-# if __name__ == "__main__":
-# app.run(host='0.0.0.0', port='5050')
 
-@app.route('/', methods=['POST', 'GET'])
-def index():
-    if request.method == 'POST':
-        url = request.form["target_url"]
-        return redirect(url_for("analyze", target_url=url))
+def parseReviewDay(review_date):
+    # 크롤링시 날짜를 제대로 긁어오도록 파싱하는 함
+    day = review_date.split(' ')[2]
+    if len(day) == 3:
+        day = day[:2]
     else:
-        return render_template('index.html')
-
-
-@app.route("/analyze", methods=['POST', 'GET'])
-def analyze():
-    url = request.form.get('target_url')
-    return render_template("analyze_result.html", target_url=url)
-
+        day = day[:1]
+    return int(day)
