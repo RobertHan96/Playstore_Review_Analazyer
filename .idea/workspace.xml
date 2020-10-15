@@ -2,14 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="61cd513a-9948-4ac7-8868-7accf7821fb7" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/AwsManager.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ImageDownloader.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/aws_manager.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/children.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/children_download.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/static/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/static/Images/figure-aws.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AwsManager.py" beforeDir="false" afterPath="$PROJECT_DIR$/AwsManager.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ChartsMaker.py" beforeDir="false" afterPath="$PROJECT_DIR$/ChartsMaker.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Images/Figure_1.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/Figure_1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Images/rating_pie.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rating_pie.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Images/rating_trend.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/rating_trend.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Images/top5.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/top5.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/static/Images/word_cloud.png" beforeDir="false" afterPath="$PROJECT_DIR$/static/images/word_cloud.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/analyze_result.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/analyze_result.html" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -94,7 +96,7 @@
       <workItem from="1602411145458" duration="3490000" />
       <workItem from="1602414821537" duration="3647000" />
       <workItem from="1602601134492" duration="3661000" />
-      <workItem from="1602694191119" duration="552000" />
+      <workItem from="1602694191119" duration="3392000" />
     </task>
     <servers />
   </component>
