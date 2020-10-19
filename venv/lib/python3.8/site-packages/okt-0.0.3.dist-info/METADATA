@@ -1,0 +1,21 @@
+Metadata-Version: 2.1
+Name: okt
+Version: 0.0.3
+Summary: CLI tool for Okta
+Home-page: https://github.com/indranilokg/okta-cli
+Author: Indranil Jha
+Author-email: indranilokg@gmail.com
+License: MIT
+Keywords: okta cli api
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+Requires-Dist: click (>=7.0)
+Requires-Dist: oktapysdk
+
+okt CLI tool
+
+
