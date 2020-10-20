@@ -2,7 +2,6 @@ from selenium import webdriver
 import time
 import urllib.request
 from bs4 import BeautifulSoup
-import asyncio
 
 # ErrorHanlder : 크롤링 도중 예외 발생시 보여줄 콘솔 안내문구를 모아놓은 데이터 클래스
 class ErrorHanlder :

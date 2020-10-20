@@ -5,7 +5,12 @@
 from Review import Reviews
 from ReviewDataParser import  ReviewDataParser
 from ChartsMaker import ChartsMaker
+import time
 
+
+import base64
+from io import BytesIO
+from matplotlib.figure import Figure
 import asyncio
 from flask import Flask, render_template, request, redirect, url_for
 # - konlpy : 유저가 남긴 리뷰 문장을 단어 단위로 분석해서 나눠주는 용도
@@ -25,14 +30,14 @@ data_parser = ReviewDataParser()
 # 유저동향을 분석할 사이트 주소 (크롤링할 주소가 됨)
 request_url = "https://play.google.com/store/apps/details?id=com.devsisters.gb&showAllReviews=true"
 
-def _main():
+def _main(url):
 # ratings : 유저들이 메겼던 평점 , dates : 유저가 리뷰를 남긴 날짜
 # nouns_list : 유저 리뷰 내용을 konlpy라이브러리로 명사 단어 단위로 나눈 뒤 저장할 리스트
 # 크롤링할 데이터를 담을 review 객체를 생성하고, getReivew() 함수로 입력받았던 url에 대한 크롤링 시작
     ratings = []
     dates = []
     nouns_list = []
-    review = Reviews(request_url)
+    review = Reviews(url)
     reviews = review.getReviews(review.url)
 
     for i in review.reviews:
@@ -81,8 +86,23 @@ def index():
 @app.route("/analyze", methods=['POST', 'GET'])
 def analyze():
     url = request.form.get('target_url')
+    _main(url)
+    time.sleep(10)
     return render_template("analyze_result.html", target_url=url)
 
+@app.route("/test_image")
+def test_image():
+   # Generate the figure **without using pyplot**.
+   fig = Figure()
+   ax = fig.subplots()
+   ax.plot([1, 2])
+   # Save it to a temporary buffer.
+   buf = BytesIO()
+   fig.savefig(buf, format="png")
+   # Embed the result in the html output.
+   data = base64.b64encode(buf.getbuffer()).decode("ascii")
+   return f"<img src='data:image/png;base64,{data}'/>"
+
 if __name__ == "__main__":
-    # app.run(host='0.0.0.0', port='5050') 플라스크서버 실행용
+    app.run(host='0.0.0.0', port='5050', debug=True)
     _main()

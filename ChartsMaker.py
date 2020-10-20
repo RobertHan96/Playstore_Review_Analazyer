@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib import rc
 import uuid
+import base64
+from io import BytesIO
+
 from wordcloud import WordCloud
 from AwsManager import AwsManager
 
@@ -10,6 +14,15 @@ def make_uuid():
 
 class ChartsMaker():
     aws = AwsManager(make_uuid())
+
+    @classmethod
+    def makeFig(self):
+        fig = Figure()
+        ax = fig.subplots()
+        ax.plot([1, 2])
+        # Save it to a temporary buffer.
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
 
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
@@ -27,6 +40,7 @@ class ChartsMaker():
                          ha='center')  # horizontal alignment can be left, right or center
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        plt.close(fig_path)
 
     @classmethod
     def ratingChart(self, ratings, rating_counts):
@@ -38,6 +52,7 @@ class ChartsMaker():
         plt.bar(ratings, rating_counts, color='lightblue')
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        plt.close(fig_path)
 
     @classmethod
     def ratingPieChart(self, rating_count, labels_arr):
@@ -48,6 +63,7 @@ class ChartsMaker():
         plt.axis('equal')
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        plt.close(fig_path)
 
     @classmethod
     def makeWordCloud(self, words):
@@ -60,7 +76,7 @@ class ChartsMaker():
         wc_arrary = wc.to_array()
 
         fig = plt.figure(figsize=(10, 10))
-        plt.imshow(wc_arrary, interpolation="bilinear")
+        # plt.imshow(wc_arrary, interpolation="bilinear")
         plt.axis('off')
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
