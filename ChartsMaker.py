@@ -17,12 +17,18 @@ class ChartsMaker():
 
     @classmethod
     def makeFig(self):
-        fig = Figure()
-        ax = fig.subplots()
-        ax.plot([1, 2])
-        # Save it to a temporary buffer.
-        buf = BytesIO()
-        fig.savefig(buf, format="png")
+        plt.figure(figsize=(4, 3))
+        plt.rc('font', family='NanumBarunGothic')
+        plt.title('가장 많이 언급된 단어')
+        plt.xlabel('언급된 단어')
+        plt.ylabel('언급 횟수')
+        plt.plot(['안녕', '하세요','그럼','테슽', '트'], [1,2,3,4,5], 'skyblue', marker='o', ms=15, mfc='r')
+
+        img = BytesIO()
+        plt.savefig(img, format='png', dpi=200)
+        ## object를 읽었기 때문에 처음으로 돌아가줌
+        chart = img.seek(0)
+        return chart
 
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
