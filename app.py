@@ -1,11 +1,8 @@
-# 사용자 정의 클래스 3개 import 필요
-# - Reviews : 플레이스토어 데이터 크롤링 모듈
-# - ReviewDataParser : 크롤링된 리스트를 데이터 시각화하기 좋은 형태로 파싱하는 모듈
-# - ChartsMaker : 그래프, 워드크라우드 제작 모듈
 from Review import Reviews
 from ReviewDataParser import  ReviewDataParser
 from ChartsMaker import ChartsMaker
 import time
+from wordcloud import WordCloud
 import base64
 from io import BytesIO
 import matplotlib
@@ -61,13 +58,18 @@ def _main(url):
     # 워드크라우드 제작을 위해 기존의 단어리스트를 딕셔너리 형태로 변환
     # Ex) {"게임" : 123, "현질유도": 76, "이벤트" : 22}
     nouns_counter_dict = Counter(nouns_list)
+    crawl_result = [nouns, nouns_count, ratings, rating_count, nouns_counter_dict]
 
-    # 단어, 언급횟수 or 별점, 별점개수로만 이뤄진 리스트를 통해 챠트 시각화
-    # charts_maker.wordsFrequencyChart(nouns, nouns_count)
-    # charts_maker.ratingChart(ratings, rating_count)
-    # charts_maker.ratingPieChart(rating_count, ratings)
-    # makeWrodCloud 함수는 {단어 : 언급횟수} 형태의 딕셔너리 값을 넣어서 호출 해야함
-    # charts_maker.makeWordCloud(nouns_counter_dict)
+    return crawl_result
+
+def convert_png_to_base64_data(byte_images) :
+    base64_format_string = "data:image/png;base64,"
+    base64_chart_images = []
+    for chart in byte_images :
+        base64_chart_images.append(base64_format_string+base64.b64encode(chart.getvalue()).decode('utf8'))
+        base64_format_string = "data:image/png;base64,"
+
+    return base64_chart_images
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
@@ -82,33 +84,20 @@ def index():
 @app.route("/analyze", methods=['POST', 'GET'])
 def analyze():
     url = request.form.get('target_url')
-    # _main(url)
-    charts_maker.makeFig()
-    time.sleep(10)
-    return render_template("analyze_result.html", target_url=url)
-
-
-# 챠트를 그리는 함수, 여기서 데이터를 입력 받고, aws 업로드까지 처리하면 될듯
-def makePlot(x, y) :
-    img = BytesIO()
-    plt.rc('font', family='NanumBarunGothic')
-    plt.title('가장 많이 언급된 단어')
-    plt.xlabel('언급된 단어')
-    plt.ylabel('언급 횟수')
-    plt.plot(x, y, 'skyblue', marker='o', ms=15, mfc='r')
-    plt.title('most')
-
-    plt.savefig(img)
-    img.seek(0)
-    return img
+    crawled_data = _main(url)
+    byte_images = charts_maker.make_charts(crawled_data)
+    base64_images = convert_png_to_base64_data(byte_images)
+    # return render_template("analyze_result.html", target_url=url)
+    return render_template("image.html", image=base64_images, url=url)
 
 @app.route('/mypic', methods=['GET'])
 def mypic():
-    img = makePlot(['안녕', '하세요', '그럼', '테슽', '트'], [1, 2, 3, 4, 35])
+    url = 'naver.com'
+    # img = makePlot(['안녕', '하세요', '그럼', '테슽', '트'], [1, 2, 3, 4, 35])
     pngImageB64String = "data:image/png;base64,"
     pngImageB64String += base64.b64encode(img.getvalue()).decode('utf8')
 
-    return render_template("image.html", image=pngImageB64String)
+    return render_template("image.html", image=pngImageB64String, url=url)
 
 
 # 이미지만 파일 형태로 반환하는 로직
@@ -128,4 +117,3 @@ def plot():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='5050', debug=True)
-    _main()

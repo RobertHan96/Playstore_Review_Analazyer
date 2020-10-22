@@ -1,8 +1,6 @@
 import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
 from matplotlib import rc
 import uuid
-import base64
 from io import BytesIO
 
 from wordcloud import WordCloud
@@ -16,19 +14,21 @@ class ChartsMaker():
     aws = AwsManager(make_uuid())
 
     @classmethod
-    def makeFig(self):
-        plt.figure(figsize=(4, 3))
-        plt.rc('font', family='NanumBarunGothic')
-        plt.title('가장 많이 언급된 단어')
-        plt.xlabel('언급된 단어')
-        plt.ylabel('언급 횟수')
-        plt.plot(['안녕', '하세요','그럼','테슽', '트'], [1,2,3,4,5], 'skyblue', marker='o', ms=15, mfc='r')
+    def make_charts(self, data):
+        nouns = data[0]
+        nouns_count = data[1]
+        ratings = data[2]
+        rating_count = data[3]
+        nouns_counter_dict = data[4]
+        # 단어, 언급횟수 or 별점, 별점개수로만 이뤄진 리스트를 통해 챠트 시각화
+        words_frequency_chart = self.wordsFrequencyChart(nouns, nouns_count)
+        rating_chart = self.ratingChart(ratings, rating_count)
+        rating_pie_chart = self.ratingPieChart(rating_count, ratings)
+        # makeWrodCloud 함수는 {단어 : 언급횟수} 형태의 딕셔너리 값을 넣어서 호출 해야함
+        wrod_cloud = self.makeWordCloud(nouns_counter_dict)
+        byte_images = [words_frequency_chart, rating_chart, rating_pie_chart, wrod_cloud]
 
-        img = BytesIO()
-        plt.savefig(img, format='png', dpi=200)
-        ## object를 읽었기 때문에 처음으로 돌아가줌
-        chart = img.seek(0)
-        return chart
+        return byte_images
 
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
@@ -46,7 +46,11 @@ class ChartsMaker():
                          ha='center')  # horizontal alignment can be left, right or center
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
-        plt.close(fig_path)
+        img = BytesIO()
+        plt.savefig(img)
+        img.seek(0)
+        plt.close()
+        return img
 
     @classmethod
     def ratingChart(self, ratings, rating_counts):
@@ -56,9 +60,15 @@ class ChartsMaker():
         plt.xlabel('평점')
         plt.ylabel('평점 수')
         plt.bar(ratings, rating_counts, color='lightblue')
+
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
-        plt.close(fig_path)
+
+        img = BytesIO()
+        plt.savefig(img)
+        img.seek(0)
+        plt.close()
+        return img
 
     @classmethod
     def ratingPieChart(self, rating_count, labels_arr):
@@ -67,9 +77,15 @@ class ChartsMaker():
         plt.title('평점 비율')
         plt.pie(rating_count, labels=labels, autopct='%1.f%%')
         plt.axis('equal')
+
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
-        plt.close(fig_path)
+
+        img = BytesIO()
+        plt.savefig(img)
+        img.seek(0)
+        plt.close()
+        return img
 
     @classmethod
     def makeWordCloud(self, words):
@@ -82,9 +98,16 @@ class ChartsMaker():
         wc_arrary = wc.to_array()
 
         fig = plt.figure(figsize=(10, 10))
-        # plt.imshow(wc_arrary, interpolation="bilinear")
+        plt.imshow(wc_arrary, interpolation="bilinear")
         plt.axis('off')
         plt.savefig(fig_path)
         self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+
+        img = BytesIO()
+        plt.savefig(img)
+        img.seek(0)
+        plt.close()
+        return img
+
 
 

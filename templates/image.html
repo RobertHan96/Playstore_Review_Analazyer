@@ -1,12 +1,18 @@
 <html>
   <head>
-    <title>random normal - {{mean}}, {{var}} </title>
+    <title>유저 피드백 분석 결과 </title>
   </head>
   <body>
-    <h2>This is random normal image</h2>
-    <h3>this is h3 </h3>
-    <p>this is the paragraph</p>
+    <h1>유저 피드백 분석 결과</h1>
+    <p> 분석한 사이트 : {{ url }} </p>
+    <h3>가장 많이 언급된 단어 TOP5</h3>
+      <img src="{{ image[0] }}" alt="Image Placeholder"/>
+    <h3>최근 평점 분포</h3>
+      <img src="{{ image[1] }}" alt="Image Placeholder"/>
+    <h3>평점 비율</h3>
+      <img src="{{ image[2] }}" alt="Image Placeholder"/>
+    <h3>Word cloud</h3>
+      <img src="{{ image[3] }}" alt="Image Placeholder"/>
 
-      <img src="{{ image }}" alt="Image Placeholder"/>
   </body>
 </html>
