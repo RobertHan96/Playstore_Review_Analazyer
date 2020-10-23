@@ -22,7 +22,6 @@ okt = Okt()
 charts_maker = ChartsMaker()
 data_parser = ReviewDataParser()
 # 유저동향을 분석할 사이트 주소 (크롤링할 주소가 됨)
-request_url = "https://play.google.com/store/apps/details?id=com.devsisters.gb&showAllReviews=true"
 
 def _main(url):
 # ratings : 유저들이 메겼던 평점 , dates : 유저가 리뷰를 남긴 날짜
@@ -33,34 +32,37 @@ def _main(url):
     nouns_list = []
     review = Reviews(url)
     reviews = review.getReviews(review.url)
+    try :
+        for i in review.reviews:
+            ratings.append(i.stars)
+            # 날짜는 데이터를 추가하기 전에 포맷을 통일하기 위해 parseReviewDay 함수를 이용해야 함
+            # ex) 1~9일, 즉 한 자리로 들어오는 날짜들을 01, 02, 03.. 형태로 변환해줌
+            dates.append(data_parser.parseReviewDay(i.date))
 
-    for i in review.reviews:
-        ratings.append(i.stars)
-        # 날짜는 데이터를 추가하기 전에 포맷을 통일하기 위해 parseReviewDay 함수를 이용해야 함
-        # ex) 1~9일, 즉 한 자리로 들어오는 날짜들을 01, 02, 03.. 형태로 변환해줌
-        dates.append(data_parser.parseReviewDay(i.date))
+            # 명사만 뽑는 함수 okt.nouns를 이용해 string 형태의 리뷰 내용을 단어 단위의 리스트로 변환함
+            # Ex) "안녕하세요 오늘 날씨가 좋습니다" => ["안녕", "하세요", "오늘", "날씨", "좋습니다"] 형태의 리스트로 바뀌게 됨
+            noun = okt.nouns(i.comment)
+            for nn in noun:
+                # 각 단어들을 nouns_list에 추가하되, 단어길이가 2글자 이상인 경우만 추가함
+                # 단어 길이가 1인 경우(은, 는, 이, 가, 기호) 처럼 의미없는 단어일 확률이 높기 때문
+                if len(nn) > 1:
+                    nouns_list.append(nn)
 
-        # 명사만 뽑는 함수 okt.nouns를 이용해 string 형태의 리뷰 내용을 단어 단위의 리스트로 변환함
-        # Ex) "안녕하세요 오늘 날씨가 좋습니다" => ["안녕", "하세요", "오늘", "날씨", "좋습니다"] 형태의 리스트로 바뀌게 됨
-        noun = okt.nouns(i.comment)
-        for nn in noun:
-            # 각 단어들을 nouns_list에 추가하되, 단어길이가 2글자 이상인 경우만 추가함
-            # 단어 길이가 1인 경우(은, 는, 이, 가, 기호) 처럼 의미없는 단어일 확률이 높기 때문
-            if len(nn) > 1:
-                nouns_list.append(nn)
+        # sortCounterArrary : 단어 리스트를 단어, 단어 언급횟수 두개의 리스트로 나눠주는 함수
+        # Ex) ['안녕', '안녕', '안녕, '이득', '개이득'] => ['안녕', '이득', '개이득'], [3, 1, 1] 두개의 리스트로 결과값 반환
+        # 위 2개의 리스트를 이용해서 많이 언급된 TOP5 단어 그래프를 만들수 있음
+        nouns, nouns_count = data_parser.sortCounterArrary(nouns_list)
+        ratings, rating_count = data_parser.sortCounterArrary(ratings)
 
-    # sortCounterArrary : 단어 리스트를 단어, 단어 언급횟수 두개의 리스트로 나눠주는 함수
-    # Ex) ['안녕', '안녕', '안녕, '이득', '개이득'] => ['안녕', '이득', '개이득'], [3, 1, 1] 두개의 리스트로 결과값 반환
-    # 위 2개의 리스트를 이용해서 많이 언급된 TOP5 단어 그래프를 만들수 있음
-    nouns, nouns_count = data_parser.sortCounterArrary(nouns_list)
-    ratings, rating_count = data_parser.sortCounterArrary(ratings)
+        # 워드크라우드 제작을 위해 기존의 단어리스트를 딕셔너리 형태로 변환
+        # Ex) {"게임" : 123, "현질유도": 76, "이벤트" : 22}
+        nouns_counter_dict = Counter(nouns_list)
+        crawl_result = [nouns, nouns_count, ratings, rating_count, nouns_counter_dict]
 
-    # 워드크라우드 제작을 위해 기존의 단어리스트를 딕셔너리 형태로 변환
-    # Ex) {"게임" : 123, "현질유도": 76, "이벤트" : 22}
-    nouns_counter_dict = Counter(nouns_list)
-    crawl_result = [nouns, nouns_count, ratings, rating_count, nouns_counter_dict]
-
-    return crawl_result
+        return crawl_result
+    except :
+        print("수집된 데이터가 너무 적거나 없습니다.")
+        return -1
 
 def convert_png_to_base64_data(byte_images) :
     base64_format_string = "data:image/png;base64,"
@@ -88,7 +90,7 @@ def analyze():
     byte_images = charts_maker.make_charts(crawled_data)
     base64_images = convert_png_to_base64_data(byte_images)
     # return render_template("analyze_result.html", target_url=url)
-    return render_template("image.html", image=base64_images, url=url)
+    return render_template("image.html", image=base64_images)
 
 @app.route('/mypic', methods=['GET'])
 def mypic():

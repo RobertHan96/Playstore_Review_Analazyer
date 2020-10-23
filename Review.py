@@ -24,7 +24,6 @@ class Review:
 class Reviews :
     url = ''
     reviews = []
-
     # timeout_limit : 해당 시간(초)내로 target_url에 응답이 없으면, 네트워크 연결이 없다고 간주하고 크롤링 중단
     timeout_limit = 5
     crwaled_reviews_count = -2
@@ -42,12 +41,23 @@ class Reviews :
             print(ErrorHanlder.connection_fail_err_text, err)
             return False
 
+    @classmethod
+    def getHeadlessDriverOptions(self):
+        driver_path = "/Users/mac/0_Dev/PythonProjects/review_analazyer/chromedriver"
+        user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36"
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        options.add_argument('window-size=1920x1080')
+        options.add_argument(user_agent)
+        options.add_argument("lang=ko_KR")
+        driver = webdriver.Chrome(driver_path, chrome_options=options)
+        return driver
+
     # getReviews : 셀레니움을 통해 사이트 접속 & 크롤링
     @classmethod
     def getReviews(self, url):
         try:
-            driver_path = "/Users/mac/0_Dev/PythonProjects/review_analazyer/chromedriver"
-            driver = webdriver.Chrome(driver_path)
+            driver = self.getHeadlessDriverOptions()
             driver.get(url)
             driver.implicitly_wait(100)
 

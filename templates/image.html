@@ -1,18 +1,38 @@
 <html>
   <head>
     <title>유저 피드백 분석 결과 </title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
+    <!-- CSS Reset -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.css">
+    <!-- Milligram CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/milligram/1.4.1/milligram.css">
   </head>
-  <body>
-    <h1>유저 피드백 분석 결과</h1>
-    <p> 분석한 사이트 : {{ url }} </p>
-    <h3>가장 많이 언급된 단어 TOP5</h3>
-      <img src="{{ image[0] }}" alt="Image Placeholder"/>
-    <h3>최근 평점 분포</h3>
-      <img src="{{ image[1] }}" alt="Image Placeholder"/>
-    <h3>평점 비율</h3>
-      <img src="{{ image[2] }}" alt="Image Placeholder"/>
-    <h3>Word cloud</h3>
-      <img src="{{ image[3] }}" alt="Image Placeholder"/>
 
+  <body>
+    <div class="container">
+      <div class="row">
+        <h1>분석 결과</h1>
+      </div>
+      <div class="row">
+        <div class="column column-33">
+          <h3>가장 많이 언급된 단어 TOP5</h3>
+          <img src="{{ image[0] }}" alt="Image Placeholder"/>
+        </div>
+        <div class="column column-33">
+          <h3>최근 평점 분포</h3>
+          <img src="{{ image[1] }}" alt="Image Placeholder"/>
+        </div>
+        <div class="column column-33">
+          <h3>평점 비율</h3>
+          <img src="{{ image[2] }}" alt="Image Placeholder"/>
+        </div>
+        <div class="column column-33">
+          <h3>Word cloud</h3>
+          <img src="{{ image[3] }}" alt="Image Placeholder"/>
+        </div>
+      </div>
+    </div>
   </body>
+
 </html>

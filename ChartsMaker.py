@@ -27,7 +27,7 @@ class ChartsMaker():
         # makeWrodCloud 함수는 {단어 : 언급횟수} 형태의 딕셔너리 값을 넣어서 호출 해야함
         wrod_cloud = self.makeWordCloud(nouns_counter_dict)
         byte_images = [words_frequency_chart, rating_chart, rating_pie_chart, wrod_cloud]
-
+        print("all charts are uploaded")
         return byte_images
 
     @classmethod
