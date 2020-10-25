@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from Review import Reviews
 from ReviewDataParser import  ReviewDataParser
 from ChartsMaker import ChartsMaker

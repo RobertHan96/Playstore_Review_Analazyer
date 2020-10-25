@@ -1,4 +1,4 @@
-from builtins import str
+# -*- coding: utf-8 -*-
 
 import os
 import uuid
