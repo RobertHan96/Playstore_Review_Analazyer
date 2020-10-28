@@ -7,10 +7,12 @@ from FileDownloader import FileDownloader
 import base64
 from io import BytesIO
 import matplotlib
+from User import User, make_uuid
 matplotlib.use('Agg')
 import os
+import uuid
 import matplotlib.pyplot as plt
-from flask import Flask, render_template, request, redirect, url_for, send_file
+from flask import Flask, render_template, request, redirect, url_for, send_file, g
 import urllib.request
 # - konlpy : 유저가 남긴 리뷰 문장을 단어 단위로 분석해서 나눠주는 용도 (pip install konlpy)
 from konlpy.tag import Okt
@@ -19,9 +21,8 @@ from collections import Counter
 
 app = Flask(__name__)
 okt = Okt()
-
-url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 # 데이터 시각화, 파싱을 위해 만든 모듈을 객체 형태로 불러옴
+user_id = ''
 charts_maker = ChartsMaker()
 data_parser = ReviewDataParser()
 # 유저동향을 분석할 사이트 주소 (크롤링할 주소가 됨)
@@ -89,24 +90,20 @@ def index():
 @app.route("/analyze", methods=['POST', 'GET'])
 def analyze():
     url = request.form.get('target_url')
+    print("분석 시작", url)
     crawled_data = _main(url)
-    byte_images = charts_maker.make_charts(crawled_data)
+    byte_images, user_id = charts_maker.make_charts(crawled_data)
     base64_images = convert_png_to_base64_data(byte_images)
+    print("차트 생성 완료", user_id)
     return render_template("image.html", image=base64_images)
 
 @app.route("/download_images", methods=['POST', 'GET'])
 def download_images():
+    print(charts_maker.uid)
     if request.method == 'GET' :
         try :
             file_downloader = FileDownloader()
-            img_urls = [
-                "https://analyzed-images-bucket.s3.amazonaws.com/01513265-a208-4708-875e-8ccb73fb2fe9_rating_bar_chart.png",
-                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_word_cloud.png",
-                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_rating_pie_chart.png",
-                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_word_frequency_chart.png"
-                ]
-
-            file_downloader.downloadImages(img_urls)
+            file_downloader.downloadImages(user_id)
         except :
             print("이미지 다운로드 실패")
     return (''), 204

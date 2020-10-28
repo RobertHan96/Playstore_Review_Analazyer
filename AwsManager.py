@@ -1,17 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import os
-import uuid
 import boto3
 from dotenv import load_dotenv
-class AwsManager :
-    uid = ''
-
-    def __init__(self, uid):
-        self.uid = uid
-        print(uid)
-
-
+class AwsManager() :
     load_dotenv(verbose=True)
     bucket_name = 'analyzed-images-bucket'
 
@@ -27,17 +19,17 @@ class AwsManager :
         s3_resource = session.resource('s3')
         return s3_resource.create_bucket(Bucket='analyzed-images-bucket', ACL='public-read', CreateBucketConfiguration = {'LocationConstraint': 'ap-northeast-2'})
 
-    def upload_file_to_bucket(self, bucket_name, file_path):
+    def upload_file_to_bucket(self, bucket_name, file_path, uid):
         session = AwsManager.aws_session()
         s3_resource = session.resource('s3')
         file_dir, file_name = os.path.split(file_path)
         bucket = s3_resource.Bucket(bucket_name)
         bucket.upload_file(
           Filename=file_path,
-          Key="{}_{}".format(self.uid,file_name),
+          Key="{}_{}".format(uid,file_name),
           ExtraArgs={'ACL': 'public-read'}
         )
-        print("file is uploaded : {}_{}".format(self.uid, file_name))
+        print("file is uploaded : {}_{}".format(uid, file_name))
         s3_url = f"https://{bucket_name}.s3.amazonaws.com/{file_name}"
         return s3_url
 

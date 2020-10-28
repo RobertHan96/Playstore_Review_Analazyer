@@ -2,18 +2,15 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
-import uuid
+from User import make_uuid
 from io import BytesIO
 
 from wordcloud import WordCloud
 from AwsManager import AwsManager
 
-def make_uuid():
-    uid = str(uuid.uuid4())
-    return uid
-
 class ChartsMaker():
-    aws = AwsManager(make_uuid())
+    aws = AwsManager()
+    uid = make_uuid()
 
     @classmethod
     def make_charts(self, data):
@@ -30,7 +27,7 @@ class ChartsMaker():
         wrod_cloud = self.makeWordCloud(nouns_counter_dict)
         byte_images = [words_frequency_chart, rating_chart, rating_pie_chart, wrod_cloud]
         print("all charts are uploaded")
-        return byte_images
+        return byte_images, self.uid
 
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
@@ -47,7 +44,7 @@ class ChartsMaker():
                          va='center',
                          ha='center')  # horizontal alignment can be left, right or center
         plt.savefig(fig_path)
-        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path, self.uid)
         img = BytesIO()
         plt.savefig(img)
         img.seek(0)
@@ -64,7 +61,7 @@ class ChartsMaker():
         plt.bar(ratings, rating_counts, color='lightblue')
 
         plt.savefig(fig_path)
-        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path, self.uid)
 
         img = BytesIO()
         plt.savefig(img)
@@ -81,7 +78,7 @@ class ChartsMaker():
         plt.axis('equal')
 
         plt.savefig(fig_path)
-        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path, self.uid)
 
         img = BytesIO()
         plt.savefig(img)
@@ -103,7 +100,7 @@ class ChartsMaker():
         plt.imshow(wc_arrary, interpolation="bilinear")
         plt.axis('off')
         plt.savefig(fig_path)
-        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path)
+        self.aws.upload_file_to_bucket(self.aws.bucket_name, fig_path, self.uid)
 
         img = BytesIO()
         plt.savefig(img)
