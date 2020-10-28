@@ -4,13 +4,13 @@ import os
 import uuid
 import boto3
 from dotenv import load_dotenv
-
 class AwsManager :
     uid = ''
 
     def __init__(self, uid):
         self.uid = uid
         print(uid)
+
 
     load_dotenv(verbose=True)
     bucket_name = 'analyzed-images-bucket'

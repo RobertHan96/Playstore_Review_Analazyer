@@ -3,15 +3,15 @@
 from Review import Reviews
 from ReviewDataParser import  ReviewDataParser
 from ChartsMaker import ChartsMaker
-import time
-from wordcloud import WordCloud
+from FileDownloader import FileDownloader
 import base64
 from io import BytesIO
 import matplotlib
 matplotlib.use('Agg')
+import os
 import matplotlib.pyplot as plt
 from flask import Flask, render_template, request, redirect, url_for, send_file
-
+import urllib.request
 # - konlpy : 유저가 남긴 리뷰 문장을 단어 단위로 분석해서 나눠주는 용도 (pip install konlpy)
 from konlpy.tag import Okt
 # - collections : 리스트내에 특정 데이터가 들어간 횟수를 count해서 딕셔너리로 바꿔주는 용도 (파이썬 기본 라이브러리)
@@ -20,6 +20,7 @@ from collections import Counter
 app = Flask(__name__)
 okt = Okt()
 
+url = "https://play.google.com/store/apps/details?id=com.nexon.kart&showAllReviews=true"
 # 데이터 시각화, 파싱을 위해 만든 모듈을 객체 형태로 불러옴
 charts_maker = ChartsMaker()
 data_parser = ReviewDataParser()
@@ -33,7 +34,8 @@ def _main(url):
     dates = []
     nouns_list = []
     review = Reviews(url)
-    reviews = review.getReviews(review.url)
+    review.getReviews(review.url)
+
     try :
         for i in review.reviews:
             ratings.append(i.stars)
@@ -60,7 +62,6 @@ def _main(url):
         # Ex) {"게임" : 123, "현질유도": 76, "이벤트" : 22}
         nouns_counter_dict = Counter(nouns_list)
         crawl_result = [nouns, nouns_count, ratings, rating_count, nouns_counter_dict]
-
         return crawl_result
     except :
         print("수집된 데이터가 너무 적거나 없습니다.")
@@ -91,8 +92,24 @@ def analyze():
     crawled_data = _main(url)
     byte_images = charts_maker.make_charts(crawled_data)
     base64_images = convert_png_to_base64_data(byte_images)
-    # return render_template("analyze_result.html", target_url=url)
     return render_template("image.html", image=base64_images)
+
+@app.route("/download_images", methods=['POST', 'GET'])
+def download_images():
+    if request.method == 'GET' :
+        try :
+            file_downloader = FileDownloader()
+            img_urls = [
+                "https://analyzed-images-bucket.s3.amazonaws.com/01513265-a208-4708-875e-8ccb73fb2fe9_rating_bar_chart.png",
+                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_word_cloud.png",
+                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_rating_pie_chart.png",
+                "https://analyzed-images-bucket.s3.amazonaws.com/0d32a4fe-a9d1-4187-ac23-775b889fa62d_word_frequency_chart.png"
+                ]
+
+            file_downloader.downloadImages(img_urls)
+        except :
+            print("이미지 다운로드 실패")
+    return (''), 204
 
 @app.route('/mypic', methods=['GET'])
 def mypic():
