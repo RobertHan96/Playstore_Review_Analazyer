@@ -12,7 +12,9 @@ matplotlib.use('Agg')
 import os
 import uuid
 import matplotlib.pyplot as plt
-from flask import Flask, render_template, request, redirect, url_for, send_file, g
+from flask import Flask, render_template, request, redirect, url_for, send_file, make_response, g
+from datetime import  datetime
+from functools import wraps, update_wrapper
 import urllib.request
 # - konlpy : 유저가 남긴 리뷰 문장을 단어 단위로 분석해서 나눠주는 용도 (pip install konlpy)
 from konlpy.tag import Okt
@@ -77,9 +79,21 @@ def convert_png_to_base64_data(byte_images) :
 
     return base64_chart_images
 
+def nocache(view):
+  @wraps(view)
+  def no_cache(*args, **kwargs):
+    response = make_response(view(*args, **kwargs))
+    response.headers['Last-Modified'] = datetime.now()
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+  return update_wrapper(no_cache, view)
+
 @app.route('/', methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
+        user_id = ''
         url = request.form["target_url"]
         # POST로 유저가 분석할 url을 입력한 경우에만 데이터 분석 함수를 실행하고, 결과창으로 redirect
         return redirect(url_for("analyze", target_url=url))
@@ -88,18 +102,22 @@ def index():
         return render_template('index.html')
 
 @app.route("/analyze", methods=['POST', 'GET'])
+@nocache
 def analyze():
     url = request.form.get('target_url')
-    print("분석 시작", url)
+    print("분석 시작 : ", url)
     crawled_data = _main(url)
+    global user_id
     byte_images, user_id = charts_maker.make_charts(crawled_data)
     base64_images = convert_png_to_base64_data(byte_images)
-    print("차트 생성 완료", user_id)
+    print(user_id, "계정에 대한 차트 생성 완료")
     return render_template("image.html", image=base64_images)
 
 @app.route("/download_images", methods=['POST', 'GET'])
+@nocache
 def download_images():
-    print(charts_maker.uid)
+    global user_id
+    print("download", user_id)
     if request.method == 'GET' :
         try :
             file_downloader = FileDownloader()
