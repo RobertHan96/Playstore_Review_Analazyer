@@ -7,27 +7,23 @@ from FileDownloader import FileDownloader
 import base64
 from io import BytesIO
 import matplotlib
-from User import User, make_uuid
+from User import make_uuid
 matplotlib.use('Agg')
-import os
-import uuid
 import matplotlib.pyplot as plt
-from flask import Flask, render_template, request, redirect, url_for, send_file, make_response, g
+from flask import Flask, render_template, request , send_file, make_response, Response
 from datetime import  datetime
 from functools import wraps, update_wrapper
-import urllib.request
 # - konlpy : 유저가 남긴 리뷰 문장을 단어 단위로 분석해서 나눠주는 용도 (pip install konlpy)
 from konlpy.tag import Okt
 # - collections : 리스트내에 특정 데이터가 들어간 횟수를 count해서 딕셔너리로 바꿔주는 용도 (파이썬 기본 라이브러리)
 from collections import Counter
 
 app = Flask(__name__)
+
+# okt = 명사단위로 자연어 분석해주는 모듈, chart_maker = 그래프 시각화 모듈, data_parser = 크롤링된 데이터를 챠트 생성에 맞는 형태로 변환
 okt = Okt()
-# 데이터 시각화, 파싱을 위해 만든 모듈을 객체 형태로 불러옴
-user_id = ''
 charts_maker = ChartsMaker()
 data_parser = ReviewDataParser()
-# 유저동향을 분석할 사이트 주소 (크롤링할 주소가 됨)
 
 def _main(url):
 # ratings : 유저들이 메겼던 평점 , dates : 유저가 리뷰를 남긴 날짜
@@ -92,32 +88,25 @@ def nocache(view):
 
 @app.route('/', methods=['POST', 'GET'])
 def index():
-    if request.method == 'POST':
-        user_id = ''
-        url = request.form["target_url"]
-        # POST로 유저가 분석할 url을 입력한 경우에만 데이터 분석 함수를 실행하고, 결과창으로 redirect
-        return redirect(url_for("analyze", target_url=url))
-    else:
-        # 그 외, GET로 요청된 경우 메인 페이지를 보여줌
-        return render_template('index.html')
+    res = Response(render_template("index.html"))
+    res.set_cookie("user_id", make_uuid())
+    return res
 
 @app.route("/analyze", methods=['POST', 'GET'])
 @nocache
 def analyze():
-    url = request.form.get('target_url')
-    print("분석 시작 : ", url)
+    url = request.values.get('target_url')
+    user_id = request.cookies.get("user_id", make_uuid())
     crawled_data = _main(url)
-    global user_id
-    byte_images, user_id = charts_maker.make_charts(crawled_data)
+    byte_images = charts_maker.make_charts(crawled_data, user_id)
     base64_images = convert_png_to_base64_data(byte_images)
     print(user_id, "계정에 대한 차트 생성 완료")
     return render_template("image.html", image=base64_images)
 
-@app.route("/download_images", methods=['POST', 'GET'])
+@app.route("/images", methods=['POST', 'GET'])
 @nocache
 def download_images():
-    global user_id
-    print("download", user_id)
+    user_id = request.cookies.get("user_id", make_uuid())
     if request.method == 'GET' :
         try :
             file_downloader = FileDownloader()

@@ -10,10 +10,11 @@ from AwsManager import AwsManager
 
 class ChartsMaker():
     aws = AwsManager()
-    uid = make_uuid()
+    uid = ''
 
     @classmethod
-    def make_charts(self, data):
+    def make_charts(self, data, user_id):
+        self.uid = user_id
         nouns = data[0]
         nouns_count = data[1]
         ratings = data[2]
@@ -27,7 +28,7 @@ class ChartsMaker():
         wrod_cloud = self.makeWordCloud(nouns_counter_dict)
         byte_images = [words_frequency_chart, rating_chart, rating_pie_chart, wrod_cloud]
         print("all charts are uploaded")
-        return byte_images, self.uid
+        return byte_images
 
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
