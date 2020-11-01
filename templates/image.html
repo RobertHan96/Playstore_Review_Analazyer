@@ -12,7 +12,11 @@
   <body>
     <div class="container">
       <div class="row">
-        <h1>분석 결과</h1>
+<!--    HOME 버튼을 눌러서 초기화면으로 돌아감    -->
+        <button class="column column-30 button-clear"> <a href="{{url_for('index')}}"> HOME </a> </button>
+      </div>
+      <div class="row">
+        <h1 class="column column-50">분석 결과</h1>
       </div>
       <div class="row">
         <div class="column column-22">
@@ -32,7 +36,8 @@
           <img src="{{ image[3] }}" alt="Image Placeholder"/>
         </div>
       </div>
-      <button class="button-black"> <a href="{{url_for('download_images')}}"> Download Images </a> </button>
+<!--  유저 쿠키값을 기반으로 aws s3에서 해당 ID와 일치하는 이미지 파일들을 다운로드 함    -->
+      <button class="button-outline"> <a href="{{url_for('download_images')}}"> Download Images </a> </button>
     </div>
   </body>
 

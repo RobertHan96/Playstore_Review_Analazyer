@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from Review import Reviews
 from ReviewDataParser import  ReviewDataParser
 from ChartsMaker import ChartsMaker
@@ -66,6 +65,7 @@ def _main(url):
         print("수집된 데이터가 너무 적거나 없습니다.")
         return -1
 
+# png형태의 이미지를 웹상에 보여주기 위해 base64포맷으로 변환하는 함수
 def convert_png_to_base64_data(byte_images) :
     base64_format_string = "data:image/png;base64,"
     base64_chart_images = []
@@ -75,6 +75,7 @@ def convert_png_to_base64_data(byte_images) :
 
     return base64_chart_images
 
+# 브라우저의 캐싱 기능으로 새로운 결과 이미지가 로딩안되는 오류를 막기 위해 브라우저의 캐쉬를 지우는 함수
 def nocache(view):
   @wraps(view)
   def no_cache(*args, **kwargs):
@@ -86,26 +87,31 @@ def nocache(view):
     return response
   return update_wrapper(no_cache, view)
 
+# 기본 인덱스 페이지, set_cookie를 이용해 유저별 id를 할당하면서 페이지를 그림
 @app.route('/', methods=['POST', 'GET'])
 def index():
     res = Response(render_template("index.html"))
     res.set_cookie("user_id", make_uuid())
     return res
 
+# 유저가 요청한 url에대한 분석을 수행, 이미지캐싱 방지를 위해 nocache 데코레이터 사용
 @app.route("/analyze", methods=['POST', 'GET'])
 @nocache
 def analyze():
+    # index.html의 form 태그에서 입력한 url을 가져옴
     url = request.values.get('target_url')
     user_id = request.cookies.get("user_id", make_uuid())
     crawled_data = _main(url)
     byte_images = charts_maker.make_charts(crawled_data, user_id)
     base64_images = convert_png_to_base64_data(byte_images)
     print(user_id, "계정에 대한 차트 생성 완료")
+    # 시각화 결과 이미지배열을 담아서 결과 페이지 (image.html)로 라우팅함
     return render_template("image.html", image=base64_images)
 
 @app.route("/images", methods=['POST', 'GET'])
 @nocache
 def download_images():
+    # index.html에서 만들어놨던 쿠키를 가져오고, 해당 쿠키 id값을 기준으로 Aws에서 이미지를 다운로드 받아옴
     user_id = request.cookies.get("user_id", make_uuid())
     if request.method == 'GET' :
         try :
@@ -114,31 +120,6 @@ def download_images():
         except :
             print("이미지 다운로드 실패")
     return (''), 204
-
-@app.route('/mypic', methods=['GET'])
-def mypic():
-    url = 'naver.com'
-    # img = makePlot(['안녕', '하세요', '그럼', '테슽', '트'], [1, 2, 3, 4, 35])
-    pngImageB64String = "data:image/png;base64,"
-    pngImageB64String += base64.b64encode(img.getvalue()).decode('utf8')
-
-    return render_template("image.html", image=pngImageB64String, url=url)
-
-
-# 이미지만 파일 형태로 반환하는 로직
-@app.route('/plot')
-def plot():
-    img = BytesIO()
-    plt.rc('font', family='NanumBarunGothic')
-    plt.title('가장 많이 언급된 단어')
-    plt.xlabel('언급된 단어')
-    plt.ylabel('언급 횟수')
-    plt.plot(['안녕', '하세요', '그럼', '테슽', '트'], [1, 2, 3, 4, 5], 'skyblue', marker='o', ms=15, mfc='r')
-    plt.title('most')
-
-    plt.savefig(img)
-    img.seek(0)
-    return send_file(img, mimetype='image/png')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='5050', debug=True)
