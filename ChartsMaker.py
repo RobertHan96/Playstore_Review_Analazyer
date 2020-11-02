@@ -2,6 +2,7 @@
 
 import matplotlib.pyplot as plt
 from matplotlib import rc
+import matplotlib.font_manager as fm
 from User import make_uuid
 from io import BytesIO
 
@@ -11,6 +12,8 @@ from AwsManager import AwsManager
 class ChartsMaker():
     aws = AwsManager()
     uid = ''
+    font_path = "/usr/share/fonts/NanumFont/NanumGothic.ttf"
+    fontprop = fm.FontProperties(fname=font_path)
 
     @classmethod
     def make_charts(self, data, user_id):
@@ -33,10 +36,9 @@ class ChartsMaker():
     @classmethod
     def wordsFrequencyChart(self, words, mentioned_time):
         fig_path = 'static/images/word_frequency_chart.png'
-        plt.rc('font', family='NanumBarunGothic')
-        plt.title('가장 많이 언급된 단어')
-        plt.xlabel('언급된 단어')
-        plt.ylabel('언급 횟수')
+        plt.title('가장 많이 언급된 단어', fontproperties=self.fontprop)
+        plt.xlabel('언급된 단어', fontproperties=self.fontprop)
+        plt.ylabel('언급 횟수', fontproperties=self.fontprop)
         plt.plot(words, mentioned_time, 'skyblue', marker='o', ms=15, mfc='r')
         for x, y in zip(words, mentioned_time):
             label = y
@@ -55,10 +57,9 @@ class ChartsMaker():
     @classmethod
     def ratingChart(self, ratings, rating_counts):
         fig_path = 'static/images/rating_bar_chart.png'
-        plt.rc('font', family='NanumBarunGothic')
-        plt.title('평점 추이')
-        plt.xlabel('평점')
-        plt.ylabel('평점 수')
+        plt.title('평점 추이', fontproperties=self.fontprop)
+        plt.xlabel('평점', fontproperties=self.fontprop)
+        plt.ylabel('평점 수', fontproperties=self.fontprop)
         plt.bar(ratings, rating_counts, color='lightblue')
 
         plt.savefig(fig_path)
@@ -74,7 +75,7 @@ class ChartsMaker():
     def ratingPieChart(self, rating_count, labels_arr):
         fig_path = 'static/images/rating_pie_chart.png'
         labels = ['{}점'.format(i) for i in labels_arr]
-        plt.title('평점 비율')
+        plt.title('평점 비율', fontproperties=self.fontprop)
         plt.pie(rating_count, labels=labels, autopct='%1.f%%')
         plt.axis('equal')
 
@@ -90,9 +91,8 @@ class ChartsMaker():
     @classmethod
     def makeWordCloud(self, words):
         fig_path = 'static/images/word_cloud.png'
-        rc('font', family='NanumBarunGothic')
         # 워드크라우드 디자인 테마 초기 설정
-        wc = WordCloud(font_path='/Library/Fonts/NanumBarunGothic.ttf', background_color='white', colormap='Accent_r',
+        wc = WordCloud(font_path=self.font_path, background_color='white', colormap='Accent_r',
                        width=900, height=400)
         wc.generate_from_frequencies(words)  # 워드크라우드 분석할 데이터를 객체에 삽입
         wc_arrary = wc.to_array()
@@ -108,6 +108,3 @@ class ChartsMaker():
         img.seek(0)
         plt.close()
         return img
-
-
-

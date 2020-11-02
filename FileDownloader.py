@@ -19,11 +19,3 @@ class FileDownloader() :
             download_file_name = "{}/{}.png".format(download_folder_path, self.chart_names[i])
             print("download", image_file_names[i], download_file_name)
             urllib.request.urlretrieve(image_file_names[i], download_file_name)
-
-# https://analyzed-images-bucket.s3.amazonaws.com/627ed98a-f2c0-4fae-bc3e-4e27de6c5834_word_cloud.png
-name1 = "https://analyzed-images-bucket.s3.amazonaws.com/627ed98a-f2c0-4fae-bc3e-4e27de6c5834_word_cloud.png"
-path = "/Users/mac/Downloads/test_image.png"
-name2 = "627ed98a-f2c0-4fae-bc3e-4e27de6c5834_rating_bar_chart.png"
-name3 = "627ed98a-f2c0-4fae-bc3e-4e27de6c5834_rating_pie_chart.png"
-name4 = "627ed98a-f2c0-4fae-bc3e-4e27de6c5834_word_cloud.png"
-urllib.request.urlretrieve(name1, path)

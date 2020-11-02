@@ -45,7 +45,7 @@ class Reviews :
 
     @classmethod
     def getHeadlessDriverOptions(self):
-        driver_path = "/Users/mac/0_Dev/PythonProjects/review_analazyer/chromedriver"
+        driver_path = "/home/ubuntu/Downloads/chromedriver"
         user_agent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36"
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
