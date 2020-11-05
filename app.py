@@ -108,18 +108,5 @@ def analyze():
     # 시각화 결과 이미지배열을 담아서 결과 페이지 (image.html)로 라우팅함
     return render_template("image.html", image=base64_images)
 
-@app.route("/images", methods=['POST', 'GET'])
-@nocache
-def download_images():
-    # index.html에서 만들어놨던 쿠키를 가져오고, 해당 쿠키 id값을 기준으로 Aws에서 이미지를 다운로드 받아옴
-    user_id = request.cookies.get("user_id", make_uuid())
-    if request.method == 'GET' :
-        try :
-            file_downloader = FileDownloader()
-            file_downloader.downloadImages(user_id)
-        except :
-            print("이미지 다운로드 실패")
-    return (''), 204
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port='5050', debug=True)
